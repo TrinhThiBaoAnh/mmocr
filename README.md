@@ -120,7 +120,9 @@ pip3 install -e .
 ## Get Started
 
 Please see [Quick Run](https://mmocr.readthedocs.io/en/dev-1.x/get_started/quick_run.html) for the basic usage of MMOCR.
-
+```
+python3 tools/train.py mmocr/configs/textrecog/robust_scanner/robustscanner_resnet31_5e_toy.py --lr 0.009 --num-of-epoch 2 --fre-save-epoch 1 --ocr_dataset_dir 'tests/data/rec_toy_dataset/'
+```
 ## [Model Zoo](https://mmocr.readthedocs.io/en/dev-1.x/modelzoo.html)
 
 Supported algorithms:
