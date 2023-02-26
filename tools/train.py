@@ -44,6 +44,24 @@ def parse_args():
         default='none',
         help='Job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    #############################################################################
+    parser.add_argument('--lr', type=float,
+        default=0.005,help='Change the learning rate.')
+    parser.add_argument('--momentum', type=float,
+        default=0.9,help='Change the momentum.')
+    parser.add_argument('--weight-decay', type=float,
+        default=0.0001,help='Change the weight decay.')
+    parser.add_argument('--num-of-epoch', type=float,
+        default=50,help='Change the number of epoch.')
+    parser.add_argument('--fre-save-epoch', type=float,
+        default=10,help='Change the fre_save_epoch.')
+    # parser.add_argument('--phase', type=str, 
+    #                     default='ocr', help='Choose ocr or det phase')
+    parser.add_argument('--det_dataset_dir', type=str,
+        default=None,help='Change the detection datadir')
+    parser.add_argument('--ocr_dataset_dir', type=str,
+        default=None,help='Change the ocr datadir')
+    #############################################################################
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -72,6 +90,32 @@ def main():
         # use config filename as default work_dir if cfg.work_dir is None
         cfg.work_dir = osp.join('./work_dirs',
                                 osp.splitext(osp.basename(args.config))[0])
+    #############################################################################
+    if args.lr is not None:
+        cfg.optim_wrapper.optimizer.lr = args.lr
+    # if args.momentum is not None:
+    #     cfg.optim_wrapper.optimizer.momentum = args.momentum
+    # if args.weight_decay is not None:
+    #     cfg.optim_wrapper.optimizer.weight_decay = args.weight_decay
+    if args.num_of_epoch is not None:
+        cfg.train_cfg.max_epochs = args.num_of_epoch
+    if args.fre_save_epoch is not None:
+        cfg.train_cfg.val_interval = args.fre_save_epoch
+    if args.det_dataset_dir is not None:
+            cfg.toy_det_data_root = args.dataset_dir
+            # cfg.toy_det_train = args.dataset_dir + '/Train'
+            # cfg.toy_det_test = args.dataset_dir + '/Test'
+    if args.ocr_dataset_dir is not None:
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>",args.ocr_dataset_dir)
+            cfg.toy_data_root = args.ocr_dataset_dir
+            cfg.toy_rec_train.data_root = args.ocr_dataset_dir 
+            cfg.toy_rec_test.data_root = args.ocr_dataset_dir
+            cfg.train_list[0].data_root = args.ocr_dataset_dir
+            cfg.test_list[0].data_root = args.ocr_dataset_dir
+            cfg.train_dataloader.dataset.datasets[0].data_root = args.ocr_dataset_dir
+            cfg.val_dataloader.dataset.datasets[0].data_root = args.ocr_dataset_dir
+            cfg.test_dataloader.dataset.datasets[0].data_root = args.ocr_dataset_dir
+    #############################################################################
     # enable automatic-mixed-precision training
     if args.amp:
         optim_wrapper = cfg.optim_wrapper.type
